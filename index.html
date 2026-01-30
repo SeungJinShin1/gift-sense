@@ -1,14 +1,163 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="ko">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gift-Sense | 실패 없는 선물 추천 AI</title>
+    <!-- Tailwind CSS (스타일링 프레임워크) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome (아이콘) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+<body class="flex flex-col min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-10">
+        <div class="max-w-md mx-auto px-4 py-3 flex items-center justify-between">
+            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
+                <i class="fa-solid fa-gift mr-1"></i> Gift-Sense
+            </h1>
+            <button onclick="location.reload()" class="text-gray-400 hover:text-gray-600">
+                <i class="fa-solid fa-rotate-right"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-md mx-auto w-full px-4 py-6">
+        
+        <!-- Step 1: 대상 분석 (Who & Occasion) -->
+        <section id="step-1" class="step-container">
+            <h2 class="text-2xl font-bold mb-2">누구에게 선물하시나요?</h2>
+            <p class="text-gray-500 mb-6 text-sm">받는 분의 정보를 알려주세요.</p>
+
+            <!-- 관계 선택 -->
+            <div class="mb-6">
+                <label class="block text-sm font-medium text-gray-700 mb-2">관계</label>
+                <div class="grid grid-cols-3 gap-2" id="relation-options">
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="부모님">👨‍👩‍👧‍👦 부모님</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="연인">❤️ 연인</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="친구">👯 친구</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="직장동료">💼 동료</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="조카/아이">👶 조카</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="기타">🎁 기타</button>
+                </div>
+            </div>
+
+            <!-- 성별 & 연령 -->
+            <div class="mb-6 grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">성별</label>
+                    <div class="flex gap-2" id="gender-options">
+                        <button class="option-btn flex-1 border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="남성">남성</button>
+                        <button class="option-btn flex-1 border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="여성">여성</button>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">나이대</label>
+                    <select id="age-select" class="w-full border rounded-lg p-3 text-sm bg-white focus:ring-2 focus:ring-pink-500 outline-none">
+                        <option value="10대">10대</option>
+                        <option value="20대" selected>20대</option>
+                        <option value="30대">30대</option>
+                        <option value="40대">40대</option>
+                        <option value="50대 이상">50대 이상</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 상황 (Occasion) -->
+            <div class="mb-8">
+                <label class="block text-sm font-medium text-gray-700 mb-2">상황</label>
+                <div class="grid grid-cols-3 gap-2" id="occasion-options">
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="생일">🎂 생일</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="기념일">💍 기념일</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="집들이">🏡 집들이</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="퇴사/이직">🎉 이직/퇴사</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="가벼운 선물">☕️ 가볍게</button>
+                    <button class="option-btn border rounded-lg p-3 text-sm hover:bg-gray-50 transition" data-value="명절">🌕 명절</button>
+                </div>
+            </div>
+
+            <button onclick="goToStep(2)" class="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition shadow-lg transform active:scale-95">
+                다음: 예산 설정하기
+            </button>
+        </section>
+
+        <!-- Step 2: 예산 설정 (Budget) -->
+        <section id="step-2" class="step-container hidden">
+            <button onclick="goToStep(1)" class="mb-4 text-gray-500 hover:text-black"><i class="fa-solid fa-arrow-left"></i> 뒤로가기</button>
+            <h2 class="text-2xl font-bold mb-2">예산은 어느 정도인가요?</h2>
+            <p class="text-gray-500 mb-10 text-sm">부담 없는 범위 내에서 최고의 선물을 찾아드릴게요.</p>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 mb-10">
+                <div class="flex justify-between items-end mb-6">
+                    <span class="text-gray-500 text-sm">설정 예산</span>
+                    <span id="budget-display" class="text-3xl font-bold text-pink-600">50,000원</span>
+                </div>
+                <input type="range" id="budget-slider" min="10000" max="500000" step="10000" value="50000" class="w-full mb-2">
+                <div class="flex justify-between text-xs text-gray-400 mt-2">
+                    <span>1만원</span>
+                    <span>50만원+</span>
+                </div>
+            </div>
+
+            <!-- 관심사 (선택) -->
+            <div class="mb-8">
+                <label class="block text-sm font-medium text-gray-700 mb-2">관심사 (선택)</label>
+                <div class="flex flex-wrap gap-2" id="interest-options">
+                    <button class="option-btn border rounded-full px-4 py-2 text-sm hover:bg-gray-50 transition" data-value="뷰티">💄 뷰티</button>
+                    <button class="option-btn border rounded-full px-4 py-2 text-sm hover:bg-gray-50 transition" data-value="IT/테크">🎧 IT/테크</button>
+                    <button class="option-btn border rounded-full px-4 py-2 text-sm hover:bg-gray-50 transition" data-value="패션">👗 패션</button>
+                    <button class="option-btn border rounded-full px-4 py-2 text-sm hover:bg-gray-50 transition" data-value="인테리어">🛋️ 인테리어</button>
+                    <button class="option-btn border rounded-full px-4 py-2 text-sm hover:bg-gray-50 transition" data-value="건강">💪 건강</button>
+                </div>
+            </div>
+
+            <button onclick="startRecommendation()" class="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 rounded-xl font-bold text-lg shadow-lg transform active:scale-95 transition hover:opacity-90">
+                AI 추천 받기 ✨
+            </button>
+        </section>
+
+        <!-- Step 3: 로딩 (Processing) -->
+        <section id="step-3" class="step-container hidden flex flex-col items-center justify-center py-20">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-6"></div>
+            <h3 class="text-xl font-bold text-gray-800 mb-2">최신 트렌드 검색 중...</h3>
+            <p id="loading-text" class="text-gray-500 text-center text-sm px-4">
+                Gemini가 선물 데이터를 분석하고 있습니다.<br>잠시만 기다려주세요.
+            </p>
+        </section>
+
+        <!-- Step 4: 결과 리스트 (Money Page) -->
+        <section id="step-4" class="step-container hidden">
+            <div class="flex items-center justify-between mb-6">
+                <h2 class="text-xl font-bold">🎁 추천 리스트</h2>
+                <button onclick="location.reload()" class="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-600">처음으로</button>
+            </div>
+
+            <!-- 추천 결과 컨테이너 -->
+            <div id="results-container" class="space-y-6">
+                <!-- Javascript로 카드가 여기에 삽입됩니다 -->
+            </div>
+
+            <!-- 수익화 배너 (예시) -->
+            <div class="mt-8 p-4 bg-gray-50 border border-dashed border-gray-300 rounded-lg text-center text-xs text-gray-400">
+                광고 / 쿠팡 파트너스 배너 영역
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-50 py-6 text-center text-xs text-gray-400 border-t">
+        <p>Gift-Sense © 2026. Powered by Google Gemini.</p>
+        <p class="mt-1">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
+    </footer>
+
+    <!-- Custom JS -->
+    <script type="module" src="main.js"></script>
 </body>
 </html>
