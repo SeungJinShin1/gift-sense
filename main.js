@@ -128,17 +128,13 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        // [변경됨] API 직접 호출 -> Cloudflare Function (/recommend) 호출
-        // 주의: Cloudflare Pages의 functions/ 폴더에 recommend.js가 있어야 합니다.
-        // Cloudflare 환경에서는 이 요청이 서버 사이드 함수로 전달되어 비밀 키를 사용해 Gemini를 호출합니다.
+        // Cloudflare Function (/recommend) 호출
         const response = await fetch('/recommend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-                // Gemini API 스펙에 맞춘 본문을 전달합니다. 
-                // Backend 함수(recommend.js)가 이를 그대로 중계하거나, 필요한 부분만 추출해 쓸 수 있습니다.
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
                     responseMimeType: "application/json"
@@ -147,33 +143,33 @@ window.startRecommendation = async function() {
             })
         });
 
-        // 응답 상태 확인
+        // 1. 서버(Cloudflare)에서 명시적인 에러(4xx, 5xx)를 보냈는지 확인
         if (!response.ok) {
-            const errText = await response.text();
-            throw new Error(`Server Error: ${response.status} ${errText}`);
+            // 에러 응답 본문을 읽어 사용자에게 보여줄 메시지를 구성합니다.
+            const errorData = await response.json().catch(() => ({})); 
+            // errorData에 구글 API 에러 내용이 들어있을 수 있습니다.
+            const errorMessage = errorData.error?.message || errorData.error || `서버 에러 (${response.status})`;
+            throw new Error(errorMessage);
         }
 
         const data = await response.json();
         
-        // 데이터 구조 유효성 검사 (Backend 함수가 Gemini 응답을 그대로 주는지, 가공해서 주는지에 따라 다를 수 있음)
-        // 보통 Gemini Proxy라면 candidates 구조를 유지합니다.
+        // 2. 정상 응답(200 OK)이지만 데이터 구조가 유효한지 확인
         if (data.candidates && data.candidates[0].content) {
             const resultText = data.candidates[0].content.parts[0].text;
             const resultJson = JSON.parse(resultText);
             renderResults(resultJson.recommendations);
+        } else if (data.recommendations) {
+            renderResults(data.recommendations);
         } else {
-            // 만약 Backend가 바로 JSON을 반환한다면 (예외 처리)
-            if (data.recommendations) {
-                 renderResults(data.recommendations);
-            } else {
-                throw new Error("Invalid response format from server");
-            }
+             // 3. 200 OK인데 데이터가 이상한 경우 (예: 안전 필터 등)
+             console.error("Unknown Response:", data);
+             throw new Error("AI 응답 형식을 해석할 수 없습니다. (Safety Filter 등)");
         }
 
     } catch (error) {
-        console.error("Error:", error);
-        // 에러 메시지: 이제는 API Key 오류가 아니라 네트워크/서버 오류입니다.
-        alert("AI 연결 중 문제가 발생했습니다. \n(Cloudflare Function '/recommend' 연결 실패 또는 서버 오류)\n\n상세: " + error.message);
+        console.error("Error details:", error);
+        alert(`문제가 발생했습니다. 잠시 후 다시 시도해주세요.\n\n[상세 에러]: ${error.message}`);
         window.goToStep(2);
     }
 };
