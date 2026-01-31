@@ -73,7 +73,6 @@ function updateBudgetUI(val) {
     budgetDisplay.textContent = val >= 500000 ? "500,000원+" : val.toLocaleString() + "원";
 }
 
-// 전역 함수 등록
 window.goToStep = function(stepNum) {
     if (stepNum === 2) {
         if (!state.relation || !state.gender || !state.occasion) {
@@ -145,16 +144,14 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        // [방식 변경] Cloudflare 함수(/recommend) 대신 브라우저에서 직접 호출
-        // 이 방식은 사용자의 IP를 사용하므로 'User location' 에러를 우회합니다.
-        
-        if (!apiKey) {
-            // apiKey 변수는 상단에서 .env 또는 직접 입력된 값을 가져옵니다.
-            throw new Error("API Key가 설정되지 않았습니다. .env 파일을 확인해주세요.");
+        if (!apiKey || apiKey.includes("붙여넣으세요")) {
+            throw new Error("API Key가 설정되지 않았습니다. main.js 파일 상단에 키를 입력해주세요.");
         }
 
-        // Gemini 1.5 Flash 모델 사용 (안정적, 속도 빠름)
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // [확정] 유료 계정용 최신 모델 (Gemini 2.5 Flash) 사용
+        // API 정식 명칭이 'gemini-2.5-flash-preview-09-2025'입니다. 
+        // 이름에 preview가 들어가지만, 이것이 현재 제공되는 2.5 Flash의 유일한 식별자입니다.
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -168,7 +165,7 @@ window.startRecommendation = async function() {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({})); 
-            const errorMessage = errorData.error?.message || `API 호출 오류 (${response.status})`;
+            const errorMessage = errorData.error?.message || `API 호출 오류 (${response.status}): ${JSON.stringify(errorData)}`;
             throw new Error(errorMessage);
         }
 
@@ -176,7 +173,7 @@ window.startRecommendation = async function() {
         
         if (data.candidates && data.candidates[0].content) {
             let resultText = data.candidates[0].content.parts[0].text;
-            // JSON 파싱을 위한 전처리 (마크다운 기호 제거 등)
+            // JSON 파싱 전처리
             const startIndex = resultText.indexOf('{');
             const endIndex = resultText.lastIndexOf('}');
             
@@ -203,7 +200,7 @@ window.startRecommendation = async function() {
         else if (error.message.includes("location")) msg = "지역 제한 오류입니다.";
         else msg = error.message;
 
-        alert(`오류: ${msg}\n잠시 후 다시 시도해주세요.`);
+        alert(`오류: ${msg}\n(잠시 후 다시 시도해주세요)`);
         window.goToStep(2);
     }
 };
