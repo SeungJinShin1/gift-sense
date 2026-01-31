@@ -95,7 +95,7 @@ window.goToStep = function(stepNum) {
 window.startRecommendation = async function() {
     window.goToStep(3); // 로딩 화면
 
-    // 프롬프트 구성
+    // 프롬프트 구성 (JSON Only 강제)
     const prompt = `
         당신은 대한민국 최고의 선물 추천 전문가(MD)입니다.
         다음 사용자 정보를 바탕으로 현재 한국 시장에서 구매 가능한 최고의 선물 3가지를 추천해주세요.
@@ -111,6 +111,7 @@ window.startRecommendation = async function() {
         2. 최신 트렌드를 반영할 것.
         3. 추천 이유는 '센스 있다'는 소리를 들을 수 있는 감성적인 포인트로 작성할 것.
         4. 아래 JSON 스키마를 정확히 따를 것.
+        5. 중요: 서론이나 결론, 인사말 등 불필요한 텍스트는 절대 포함하지 마세요. 오직 JSON 데이터만 반환하세요.
 
         Response JSON Schema:
         {
@@ -136,20 +137,13 @@ window.startRecommendation = async function() {
             },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                // [수정] Google Search Grounding 사용 시 responseMimeType: 'application/json'을 사용할 수 없습니다.
-                // 따라서 해당 설정을 제거하고, 응답받은 텍스트에서 JSON을 파싱하도록 변경합니다.
-                // generationConfig: {
-                //     responseMimeType: "application/json"
-                // },
                 tools: [{ google_search: {} }]
             })
         });
 
         // 1. 서버(Cloudflare)에서 명시적인 에러(4xx, 5xx)를 보냈는지 확인
         if (!response.ok) {
-            // 에러 응답 본문을 읽어 사용자에게 보여줄 메시지를 구성합니다.
             const errorData = await response.json().catch(() => ({})); 
-            // errorData에 구글 API 에러 내용이 들어있을 수 있습니다.
             const errorMessage = errorData.error?.message || errorData.error || `서버 에러 (${response.status})`;
             throw new Error(errorMessage);
         }
@@ -158,19 +152,24 @@ window.startRecommendation = async function() {
         
         // 2. 정상 응답(200 OK)이지만 데이터 구조가 유효한지 확인
         if (data.candidates && data.candidates[0].content) {
-            // [수정] JSON 모드가 꺼졌으므로 마크다운 코드 블록(```json)이 포함될 수 있습니다.
-            // 이를 제거하고 순수 JSON 문자열만 추출하여 파싱합니다.
+            // [수정] JSON 추출 로직 강화 (인사말/잡담 제거)
             let resultText = data.candidates[0].content.parts[0].text;
             
-            // 마크다운 코드 블록 제거 (```json ... ``` 또는 ``` ... ```)
-            resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
+            // JSON 객체 부분만 찾아서 추출합니다 (첫 번째 { 부터 마지막 } 까지)
+            const startIndex = resultText.indexOf('{');
+            const endIndex = resultText.lastIndexOf('}');
+            
+            if (startIndex !== -1 && endIndex !== -1) {
+                resultText = resultText.substring(startIndex, endIndex + 1);
+                const resultJson = JSON.parse(resultText);
+                renderResults(resultJson.recommendations);
+            } else {
+                throw new Error("응답에서 유효한 JSON 데이터를 찾을 수 없습니다.");
+            }
 
-            const resultJson = JSON.parse(resultText);
-            renderResults(resultJson.recommendations);
         } else if (data.recommendations) {
             renderResults(data.recommendations);
         } else {
-             // 3. 200 OK인데 데이터가 이상한 경우 (예: 안전 필터 등)
              console.error("Unknown Response:", data);
              throw new Error("AI 응답 형식을 해석할 수 없습니다. (Safety Filter 등)");
         }
