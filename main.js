@@ -144,18 +144,13 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        if (!apiKey || apiKey.includes("붙여넣으세요")) {
-            throw new Error("API Key가 설정되지 않았습니다. main.js 파일 상단에 키를 입력해주세요.");
-        }
-
-        // [1번 수정사항] referrerPolicy: 'origin' 추가
-        // 브라우저가 API 요청 시 도메인 출처를 강제로 포함하도록 설정
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+        // [변경됨] 내부 서버(/recommend) 호출 (API Key 노출 없음)
+        // 이 요청은 Cloudflare Functions가 받아서 처리합니다.
+        const response = await fetch('/recommend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            referrerPolicy: 'origin', 
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 tools: [{ google_search: {} }]
@@ -164,7 +159,8 @@ window.startRecommendation = async function() {
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({})); 
-            const errorMessage = errorData.error?.message || `API 호출 오류 (${response.status}): ${JSON.stringify(errorData)}`;
+            // 서버에서 보낸 에러 메시지를 표시
+            const errorMessage = errorData.error ? `${errorData.error} (${errorData.details || ''})` : `Server Error (${response.status})`;
             throw new Error(errorMessage);
         }
 
@@ -172,6 +168,7 @@ window.startRecommendation = async function() {
         
         if (data.candidates && data.candidates[0].content) {
             let resultText = data.candidates[0].content.parts[0].text;
+            // JSON 파싱 전처리 (마크다운 기호 제거)
             const startIndex = resultText.indexOf('{');
             const endIndex = resultText.lastIndexOf('}');
             
@@ -191,14 +188,7 @@ window.startRecommendation = async function() {
     } catch (error) {
         stopLoadingAnimation();
         console.error("Error details:", error);
-        
-        let msg = "문제가 발생했습니다.";
-        if (error.message.includes("API Key")) msg = "API 키 설정 오류입니다.";
-        else if (error.message.includes("quota")) msg = "사용량이 초과되었습니다.";
-        else if (error.message.includes("location")) msg = "지역 제한 오류입니다.";
-        else msg = error.message;
-
-        alert(`오류: ${msg}\n(잠시 후 다시 시도해주세요)`);
+        alert(`문제가 발생했습니다. 잠시 후 다시 시도해주세요.\n\n[상세]: ${error.message}`);
         window.goToStep(2);
     }
 };
@@ -252,4 +242,5 @@ function renderResults(recommendations) {
     window.goToStep(4);
 }
 
+// 앱 시작
 init();

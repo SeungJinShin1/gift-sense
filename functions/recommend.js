@@ -2,7 +2,7 @@ export async function onRequestPost(context) {
   const apiKey = context.env.VITE_GEMINI_API_KEY;
 
   if (!apiKey) {
-    return new Response(JSON.stringify({ error: "API Key not configured" }), {
+    return new Response(JSON.stringify({ error: "Server Configuration Error: API Key missing" }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
@@ -11,8 +11,9 @@ export async function onRequestPost(context) {
   try {
     const requestBody = await context.request.json();
 
+    // [Tier 1 유료 모델 사용] gemini-2.5-flash-preview-09-2025
     const googleResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -20,18 +21,24 @@ export async function onRequestPost(context) {
       }
     );
 
+    // 구글 API의 응답 상태를 그대로 받아서 처리
+    if (!googleResponse.ok) {
+        const errorText = await googleResponse.text();
+        return new Response(JSON.stringify({ error: `Google API Error: ${googleResponse.status}`, details: errorText }), {
+            status: googleResponse.status,
+            headers: { "Content-Type": "application/json" },
+        });
+    }
+
     const data = await googleResponse.json();
 
-    // [핵심 변경 사항] 
-    // Gemini API의 응답 상태(status)를 그대로 프론트엔드로 전달합니다.
-    // 성공이면 200, 실패면 400~500번대가 전달되어 프론트엔드에서 response.ok로 판단 가능해집니다.
     return new Response(JSON.stringify(data), {
-      status: googleResponse.status, 
+      status: 200,
       headers: { "Content-Type": "application/json" },
     });
 
   } catch (err) {
-    return new Response(JSON.stringify({ error: err.message }), {
+    return new Response(JSON.stringify({ error: "Internal Server Error", details: err.message }), {
       status: 500,
       headers: { "Content-Type": "application/json" },
     });
