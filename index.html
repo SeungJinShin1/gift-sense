@@ -3,15 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI가 추천하는 실패 없는 선물 추천 서비스. 상황, 관계, 예산에 맞춰 센스 있는 선물을 찾아드립니다.">
     <title>Gift-Sense | 실패 없는 선물 추천 AI</title>
-    <!-- Tailwind CSS (스타일링 프레임워크) -->
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome (아이콘) -->
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom CSS -->
     <link rel="stylesheet" href="style.css">
+
+    <!-- [애드센스 필수] 아래 ca-pub- 뒤의 숫자를 본인의 게시자 ID로 반드시 변경하세요 -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2560292529896467"
+     crossorigin="anonymous"></script>
 </head>
 <body class="flex flex-col min-h-screen">
 
@@ -21,7 +27,7 @@
             <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600">
                 <i class="fa-solid fa-gift mr-1"></i> Gift-Sense
             </h1>
-            <button onclick="location.reload()" class="text-gray-400 hover:text-gray-600">
+            <button onclick="location.reload()" class="text-gray-400 hover:text-gray-600" aria-label="새로고침">
                 <i class="fa-solid fa-rotate-right"></i>
             </button>
         </div>
@@ -82,6 +88,13 @@
             <button onclick="goToStep(2)" class="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition shadow-lg transform active:scale-95">
                 다음: 예산 설정하기
             </button>
+
+            <!-- [추가됨] 검색엔진/애드센스 로봇을 위한 텍스트 콘텐츠 -->
+            <div class="mt-12 pt-8 border-t border-gray-100 text-gray-500 text-xs leading-relaxed">
+                <h3 class="font-bold text-gray-700 mb-2">Gift-Sense 서비스 소개</h3>
+                <p class="mb-2">Gift-Sense는 최신 AI 기술을 활용하여 사용자의 상황과 예산에 딱 맞는 선물을 추천해주는 지능형 큐레이션 서비스입니다. 생일, 기념일, 집들이 등 다양한 상황에서 실패 없는 선물을 고를 수 있도록 도와드립니다.</p>
+                <p>빅데이터 분석을 통해 연령대별 선호도와 최신 트렌드를 반영하며, 쿠팡 및 네이버 쇼핑 최저가 정보를 제공하여 합리적인 소비를 지원합니다.</p>
+            </div>
         </section>
 
         <!-- Step 2: 예산 설정 -->
@@ -121,7 +134,7 @@
             </button>
         </section>
 
-        <!-- [변경됨] Step 3: 로딩 (동적 애니메이션 UI) -->
+        <!-- Step 3: 로딩 (동적 애니메이션 UI) -->
         <section id="step-3" class="step-container hidden flex flex-col items-center justify-center py-20">
             <!-- 움직이는 선물 상자 -->
             <div class="loading-container">
@@ -150,10 +163,11 @@
             </div>
         </section>
 
-        <!-- [변경됨] 애드센스 광고 영역 (모든 단계 노출을 위해 section 밖으로 이동) -->
+        <!-- 애드센스 광고 영역 -->
+        <!-- 중요: 구글 애드센스에서 '광고 단위 기준' 코드를 생성해서 아래 div 안에 ins 태그를 붙여넣으세요 -->
         <div class="mt-8 mb-4 adsense-container rounded-lg border border-gray-200">
             <div class="text-xs text-gray-400 p-4 text-center">
-                (구글 애드센스 광고 영역)
+                (이곳에 구글 애드센스 광고 코드 붙여넣기)
             </div>
         </div>
 
@@ -167,7 +181,13 @@
     <!-- Footer -->
     <footer class="bg-gray-50 py-6 text-center text-xs text-gray-400 border-t">
         <p>Gift-Sense © 2026. Powered by Google Gemini.</p>
-        <p class="mt-1">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
+        <p class="mt-1 mb-2">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
+        <!-- [추가됨] 애드센스 필수 링크 -->
+        <div class="space-x-2">
+            <a href="#" class="hover:text-gray-600 underline">이용약관</a>
+            <span class="text-gray-300">|</span>
+            <a href="#" class="hover:text-gray-600 underline">개인정보처리방침</a>
+        </div>
     </footer>
 
     <!-- Custom JS -->
