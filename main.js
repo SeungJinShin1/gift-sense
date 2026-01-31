@@ -11,7 +11,6 @@ const state = {
     interests: []
 };
 
-// DOM 요소 로드
 const steps = {
     1: document.getElementById('step-1'),
     2: document.getElementById('step-2'),
@@ -20,14 +19,13 @@ const steps = {
 };
 const budgetSlider = document.getElementById('budget-slider');
 const budgetDisplay = document.getElementById('budget-display');
+let loadingInterval; // 로딩 텍스트 타이머 변수
 
-// 초기화
 function init() {
     setupEventListeners();
 }
 
 function setupEventListeners() {
-    // 버튼 선택 로직 (관계, 성별, 상황, 관심사)
     document.querySelectorAll('.option-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const parent = btn.parentElement;
@@ -52,12 +50,10 @@ function setupEventListeners() {
         });
     });
 
-    // 나이 선택
     document.getElementById('age-select').addEventListener('change', (e) => {
         state.age = e.target.value;
     });
 
-    // [추가됨] 예산 칩 버튼 로직
     document.querySelectorAll('.budget-chip').forEach(chip => {
         chip.addEventListener('click', () => {
             const val = parseInt(chip.dataset.value);
@@ -65,21 +61,18 @@ function setupEventListeners() {
         });
     });
 
-    // 예산 슬라이더 로직
     budgetSlider.addEventListener('input', (e) => {
         const val = parseInt(e.target.value);
         updateBudgetUI(val);
     });
 }
 
-// [추가됨] 예산 업데이트 헬퍼 함수
 function updateBudgetUI(val) {
     state.budget = val;
-    budgetSlider.value = val; // 슬라이더 위치 동기화
+    budgetSlider.value = val;
     budgetDisplay.textContent = val >= 500000 ? "500,000원+" : val.toLocaleString() + "원";
 }
 
-// 전역 함수로 노출
 window.goToStep = function(stepNum) {
     if (stepNum === 2) {
         if (!state.relation || !state.gender || !state.occasion) {
@@ -92,10 +85,32 @@ window.goToStep = function(stepNum) {
     window.scrollTo(0, 0);
 };
 
-window.startRecommendation = async function() {
-    window.goToStep(3); // 로딩 화면
+// [추가됨] 동적 로딩 텍스트 함수
+function startLoadingAnimation() {
+    const messages = [
+        "최신 트렌드 검색 중...",
+        "연령대별 인기 상품 분석 중...",
+        "실사용 후기 데이터 확인 중...",
+        "센스 있는 추천 이유 작성 중..."
+    ];
+    let msgIndex = 0;
+    const titleEl = document.getElementById('loading-title');
+    
+    // 0.8초마다 문구 변경 (생동감 부여)
+    loadingInterval = setInterval(() => {
+        msgIndex = (msgIndex + 1) % messages.length;
+        titleEl.textContent = messages[msgIndex];
+    }, 1200);
+}
 
-    // 프롬프트 구성 (JSON Only 강제)
+function stopLoadingAnimation() {
+    if (loadingInterval) clearInterval(loadingInterval);
+}
+
+window.startRecommendation = async function() {
+    window.goToStep(3); 
+    startLoadingAnimation(); // 로딩 애니메이션 시작
+
     const prompt = `
         당신은 대한민국 최고의 선물 추천 전문가(MD)입니다.
         다음 사용자 정보를 바탕으로 현재 한국 시장에서 구매 가능한 최고의 선물 3가지를 추천해주세요.
@@ -129,19 +144,15 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        // Cloudflare Function (/recommend) 호출
         const response = await fetch('/recommend', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
                 tools: [{ google_search: {} }]
             })
         });
 
-        // 1. 서버(Cloudflare)에서 명시적인 에러(4xx, 5xx)를 보냈는지 확인
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({})); 
             const errorMessage = errorData.error?.message || errorData.error || `서버 에러 (${response.status})`;
@@ -150,24 +161,21 @@ window.startRecommendation = async function() {
 
         const data = await response.json();
         
-        // 2. 정상 응답(200 OK)이지만 데이터 구조가 유효한지 확인
         if (data.candidates && data.candidates[0].content) {
-            // [수정] JSON 추출 로직 강화 (인사말/잡담 제거)
             let resultText = data.candidates[0].content.parts[0].text;
-            
-            // JSON 객체 부분만 찾아서 추출합니다 (첫 번째 { 부터 마지막 } 까지)
             const startIndex = resultText.indexOf('{');
             const endIndex = resultText.lastIndexOf('}');
             
             if (startIndex !== -1 && endIndex !== -1) {
                 resultText = resultText.substring(startIndex, endIndex + 1);
                 const resultJson = JSON.parse(resultText);
+                stopLoadingAnimation(); // 성공 시 애니메이션 중지
                 renderResults(resultJson.recommendations);
             } else {
                 throw new Error("응답에서 유효한 JSON 데이터를 찾을 수 없습니다.");
             }
-
         } else if (data.recommendations) {
+            stopLoadingAnimation();
             renderResults(data.recommendations);
         } else {
              console.error("Unknown Response:", data);
@@ -175,6 +183,7 @@ window.startRecommendation = async function() {
         }
 
     } catch (error) {
+        stopLoadingAnimation(); // 에러 시에도 중지
         console.error("Error details:", error);
         alert(`문제가 발생했습니다. 잠시 후 다시 시도해주세요.\n\n[상세 에러]: ${error.message}`);
         window.goToStep(2);
@@ -230,5 +239,4 @@ function renderResults(recommendations) {
     window.goToStep(4);
 }
 
-// 앱 시작
 init();

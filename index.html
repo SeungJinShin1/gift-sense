@@ -35,7 +35,6 @@
             <h2 class="text-2xl font-bold mb-2">누구에게 선물하시나요?</h2>
             <p class="text-gray-500 mb-6 text-sm">받는 분의 정보를 알려주세요.</p>
 
-            <!-- 관계 선택 -->
             <div class="mb-6">
                 <label class="block text-sm font-medium text-gray-700 mb-2">관계</label>
                 <div class="grid grid-cols-3 gap-2" id="relation-options">
@@ -48,7 +47,6 @@
                 </div>
             </div>
 
-            <!-- 성별 & 연령 -->
             <div class="mb-6 grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-2">성별</label>
@@ -69,7 +67,6 @@
                 </div>
             </div>
 
-            <!-- 상황 (Occasion) -->
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">상황</label>
                 <div class="grid grid-cols-3 gap-2" id="occasion-options">
@@ -100,7 +97,6 @@
                 </div>
                 <input type="range" id="budget-slider" min="10000" max="500000" step="10000" value="50000" class="w-full mb-6">
                 
-                <!-- 예산 선택 칩 (Chips) -->
                 <div class="grid grid-cols-4 gap-2">
                     <button class="budget-chip border rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 bg-white" data-value="30000">3만원</button>
                     <button class="budget-chip border rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 bg-white" data-value="50000">5만원</button>
@@ -109,7 +105,6 @@
                 </div>
             </div>
 
-            <!-- 관심사 -->
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">관심사 (선택)</label>
                 <div class="flex flex-wrap gap-2" id="interest-options">
@@ -126,12 +121,20 @@
             </button>
         </section>
 
-        <!-- Step 3: 로딩 -->
+        <!-- [변경됨] Step 3: 로딩 (동적 애니메이션 UI) -->
         <section id="step-3" class="step-container hidden flex flex-col items-center justify-center py-20">
-            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-6"></div>
-            <h3 class="text-xl font-bold text-gray-800 mb-2">최신 트렌드 검색 중...</h3>
+            <!-- 움직이는 선물 상자 -->
+            <div class="loading-container">
+                <div class="pulse-ring"></div>
+                <div class="pulse-ring"></div>
+                <i class="fa-solid fa-gift bouncing-gift"></i>
+            </div>
+            
+            <h3 id="loading-title" class="text-xl font-bold text-gray-800 mb-2 transition-all duration-300">
+                최신 트렌드 검색 중...
+            </h3>
             <p id="loading-text" class="text-gray-500 text-center text-sm px-4">
-                Gemini가 선물 데이터를 분석하고 있습니다.<br>잠시만 기다려주세요.
+                잠시만 기다려주세요.<br>최적의 선물을 찾고 있습니다.
             </p>
         </section>
 
@@ -142,33 +145,19 @@
                 <button onclick="location.reload()" class="text-xs bg-gray-100 px-3 py-1 rounded-full text-gray-600">처음으로</button>
             </div>
 
-            <!-- 추천 결과 컨테이너 -->
             <div id="results-container" class="space-y-6">
-                <!-- Javascript로 카드가 여기에 삽입됩니다 -->
+                <!-- 결과 카드 -->
             </div>
 
-            <!-- [추가됨] 구글 애드센스 광고 영역 -->
-            <!-- 결과 리스트 바로 아래, 쿠팡 배너 위에 배치 -->
+            <!-- 애드센스 광고 영역 -->
             <div class="mt-8 mb-4 adsense-container rounded-lg border border-gray-200">
-                <!-- 여기에 애드센스 반응형 광고 단위 코드를 넣으세요 -->
-                <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2560292529896467"
-                crossorigin="anonymous"></script>
-                <!-- 예시 코드: data-ad-client와 data-ad-slot을 본인 것으로 변경해야 함 -->
                 <div class="text-xs text-gray-400 p-4 text-center">
-                    <ins class="adsbygoogle"
-                         style="display:block"
-                         data-ad-client="ca-pub-2560292529896467"
-                         data-ad-slot="XXXXXXXXXX"
-                         data-ad-format="auto"
-                         data-full-width-responsive="true"></ins>
-                    <script>
-                         (adsbygoogle = window.adsbygoogle || []).push({});
-                    </script> 
+                    (구글 애드센스 광고 영역)
                 </div>
             </div>
         </section>
 
-        <!-- 쿠팡 파트너스 배너 (모든 단계에서 하단 고정) -->
+        <!-- 쿠팡 파트너스 배너 -->
         <div class="mt-4 border-t border-gray-100 pt-6">
             <iframe src="https://coupa.ng/cltDAP" width="100%" height="75" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
         </div>

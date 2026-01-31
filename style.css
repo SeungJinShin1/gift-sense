@@ -17,7 +17,7 @@ input[type=range]::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: #ec4899; /* Pink-500 */
+    background: #ec4899;
     cursor: pointer;
     margin-top: -10px; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
@@ -45,29 +45,75 @@ input[type=range]::-webkit-slider-runnable-track {
     }
 }
 
-/* 로딩 스피너 애니메이션 */
-.loader {
-    border-top-color: #ec4899;
-    -webkit-animation: spinner 1.5s linear infinite;
-    animation: spinner 1.5s linear infinite;
-}
-
-@keyframes spinner {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
 .selected-btn {
-    background-color: #fce7f3; /* Pink-100 */
-    border-color: #ec4899; /* Pink-500 */
-    color: #be185d; /* Pink-700 */
+    background-color: #fce7f3;
+    border-color: #ec4899;
+    color: #be185d;
     font-weight: 700;
 }
 
-/* [추가됨] 예산 칩 버튼 스타일 */
 .budget-chip {
     transition: all 0.2s;
 }
 .budget-chip:active {
     transform: scale(0.95);
+}
+
+.adsense-container {
+    min-height: 100px;
+    background-color: #f1f5f9;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* [변경됨] 동적 로딩 애니메이션 스타일 */
+.loading-container {
+    position: relative;
+    width: 80px;
+    height: 80px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+/* 통통 튀는 선물 상자 */
+.bouncing-gift {
+    font-size: 3rem;
+    color: #ec4899;
+    z-index: 10;
+    animation: bounce 0.8s infinite alternate cubic-bezier(0.5, 0.05, 1, 0.5);
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-15px); }
+}
+
+/* 퍼져나가는 파동 효과 */
+.pulse-ring {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    border: 3px solid #fbcfe8;
+    opacity: 0;
+    animation: pulse 1.5s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+}
+
+.pulse-ring:nth-child(2) {
+    animation-delay: 0.5s;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(0.5);
+        opacity: 0.8;
+    }
+    100% {
+        transform: scale(1.5);
+        opacity: 0;
+    }
 }
