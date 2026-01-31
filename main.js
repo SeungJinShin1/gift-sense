@@ -136,9 +136,11 @@ window.startRecommendation = async function() {
             },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
-                generationConfig: {
-                    responseMimeType: "application/json"
-                },
+                // [수정] Google Search Grounding 사용 시 responseMimeType: 'application/json'을 사용할 수 없습니다.
+                // 따라서 해당 설정을 제거하고, 응답받은 텍스트에서 JSON을 파싱하도록 변경합니다.
+                // generationConfig: {
+                //     responseMimeType: "application/json"
+                // },
                 tools: [{ google_search: {} }]
             })
         });
@@ -156,7 +158,13 @@ window.startRecommendation = async function() {
         
         // 2. 정상 응답(200 OK)이지만 데이터 구조가 유효한지 확인
         if (data.candidates && data.candidates[0].content) {
-            const resultText = data.candidates[0].content.parts[0].text;
+            // [수정] JSON 모드가 꺼졌으므로 마크다운 코드 블록(```json)이 포함될 수 있습니다.
+            // 이를 제거하고 순수 JSON 문자열만 추출하여 파싱합니다.
+            let resultText = data.candidates[0].content.parts[0].text;
+            
+            // 마크다운 코드 블록 제거 (```json ... ``` 또는 ``` ... ```)
+            resultText = resultText.replace(/```json/g, "").replace(/```/g, "").trim();
+
             const resultJson = JSON.parse(resultText);
             renderResults(resultJson.recommendations);
         } else if (data.recommendations) {
