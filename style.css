@@ -63,3 +63,11 @@ input[type=range]::-webkit-slider-runnable-track {
     color: #be185d; /* Pink-700 */
     font-weight: 700;
 }
+
+/* [추가됨] 예산 칩 버튼 스타일 */
+.budget-chip {
+    transition: all 0.2s;
+}
+.budget-chip:active {
+    transform: scale(0.95);
+}

@@ -30,7 +30,7 @@
     <!-- Main Content Area -->
     <main class="flex-grow max-w-md mx-auto w-full px-4 py-6">
         
-        <!-- Step 1: 대상 분석 (Who & Occasion) -->
+        <!-- Step 1: 대상 분석 -->
         <section id="step-1" class="step-container">
             <h2 class="text-2xl font-bold mb-2">누구에게 선물하시나요?</h2>
             <p class="text-gray-500 mb-6 text-sm">받는 분의 정보를 알려주세요.</p>
@@ -87,7 +87,7 @@
             </button>
         </section>
 
-        <!-- Step 2: 예산 설정 (Budget) -->
+        <!-- Step 2: 예산 설정 -->
         <section id="step-2" class="step-container hidden">
             <button onclick="goToStep(1)" class="mb-4 text-gray-500 hover:text-black"><i class="fa-solid fa-arrow-left"></i> 뒤로가기</button>
             <h2 class="text-2xl font-bold mb-2">예산은 어느 정도인가요?</h2>
@@ -98,14 +98,18 @@
                     <span class="text-gray-500 text-sm">설정 예산</span>
                     <span id="budget-display" class="text-3xl font-bold text-pink-600">50,000원</span>
                 </div>
-                <input type="range" id="budget-slider" min="10000" max="500000" step="10000" value="50000" class="w-full mb-2">
-                <div class="flex justify-between text-xs text-gray-400 mt-2">
-                    <span>1만원</span>
-                    <span>50만원+</span>
+                <input type="range" id="budget-slider" min="10000" max="500000" step="10000" value="50000" class="w-full mb-6">
+                
+                <!-- [추가됨] 빠른 예산 선택 버튼 (Chips) -->
+                <div class="grid grid-cols-4 gap-2">
+                    <button class="budget-chip border rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 bg-white" data-value="30000">3만원</button>
+                    <button class="budget-chip border rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 bg-white" data-value="50000">5만원</button>
+                    <button class="budget-chip border rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 bg-white" data-value="100000">10만원</button>
+                    <button class="budget-chip border rounded-lg py-2 text-xs font-medium text-gray-600 hover:bg-pink-50 hover:text-pink-600 hover:border-pink-200 bg-white" data-value="200000">20만원</button>
                 </div>
             </div>
 
-            <!-- 관심사 (선택) -->
+            <!-- 관심사 -->
             <div class="mb-8">
                 <label class="block text-sm font-medium text-gray-700 mb-2">관심사 (선택)</label>
                 <div class="flex flex-wrap gap-2" id="interest-options">
@@ -122,7 +126,7 @@
             </button>
         </section>
 
-        <!-- Step 3: 로딩 (Processing) -->
+        <!-- Step 3: 로딩 -->
         <section id="step-3" class="step-container hidden flex flex-col items-center justify-center py-20">
             <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-16 w-16 mb-6"></div>
             <h3 class="text-xl font-bold text-gray-800 mb-2">최신 트렌드 검색 중...</h3>
@@ -131,7 +135,7 @@
             </p>
         </section>
 
-        <!-- Step 4: 결과 리스트 (Money Page) -->
+        <!-- Step 4: 결과 리스트 -->
         <section id="step-4" class="step-container hidden">
             <div class="flex items-center justify-between mb-6">
                 <h2 class="text-xl font-bold">🎁 추천 리스트</h2>
@@ -142,18 +146,19 @@
             <div id="results-container" class="space-y-6">
                 <!-- Javascript로 카드가 여기에 삽입됩니다 -->
             </div>
-
-            <!-- 쿠팡 파트너스 배너 -->
-            <div class="mt-8 text-center">
-                <a href="https://link.coupang.com/a/dCY0n4" target="_blank" referrerpolicy="unsafe-url"><img src="https://ads-partners.coupang.com/banners/961863?subId=&traceId=V0-301-879dd1202e5c73b2-I961863&w=728&h=90" alt=""></a>
-            </div>
         </section>
+
+        <!-- [수정됨] 쿠팡 파트너스 배너 (위치 이동: 모든 단계에서 노출됨) -->
+        <div class="mt-8 border-t border-gray-100 pt-6">
+            <iframe src="https://coupa.ng/cltDAP" width="100%" height="75" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
+        </div>
 
     </main>
 
     <!-- Footer -->
     <footer class="bg-gray-50 py-6 text-center text-xs text-gray-400 border-t">
         <p>Gift-Sense © 2026. Powered by Google Gemini.</p>
+        <p class="mt-1">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
     </footer>
 
     <!-- Custom JS -->

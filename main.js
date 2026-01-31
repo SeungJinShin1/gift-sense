@@ -37,7 +37,6 @@ function setupEventListeners() {
             const isMultiSelect = parent.id === 'interest-options';
 
             if (isMultiSelect) {
-                // 다중 선택 (관심사)
                 btn.classList.toggle('selected-btn');
                 if (state.interests.includes(value)) {
                     state.interests = state.interests.filter(i => i !== value);
@@ -45,7 +44,6 @@ function setupEventListeners() {
                     state.interests.push(value);
                 }
             } else {
-                // 단일 선택
                 parent.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected-btn'));
                 btn.classList.add('selected-btn');
                 
@@ -61,32 +59,43 @@ function setupEventListeners() {
         state.age = e.target.value;
     });
 
-    // 예산 슬라이더
+    // [추가됨] 예산 칩 버튼 로직
+    document.querySelectorAll('.budget-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const val = parseInt(chip.dataset.value);
+            updateBudgetUI(val);
+        });
+    });
+
+    // 예산 슬라이더 로직
     budgetSlider.addEventListener('input', (e) => {
         const val = parseInt(e.target.value);
-        state.budget = val;
-        budgetDisplay.textContent = val >= 500000 ? "500,000원+" : val.toLocaleString() + "원";
+        updateBudgetUI(val);
     });
 }
 
-// 전역 함수로 노출 (HTML onclick에서 접근 가능하도록 window 객체에 할당)
+// [추가됨] 예산 업데이트 헬퍼 함수
+function updateBudgetUI(val) {
+    state.budget = val;
+    budgetSlider.value = val; // 슬라이더 위치 동기화
+    budgetDisplay.textContent = val >= 500000 ? "500,000원+" : val.toLocaleString() + "원";
+}
+
+// 전역 함수로 노출
 window.goToStep = function(stepNum) {
-    // 유효성 검사 (Step 1 -> 2 갈 때)
     if (stepNum === 2) {
         if (!state.relation || !state.gender || !state.occasion) {
             alert('관계, 성별, 상황을 모두 선택해주세요!');
             return;
         }
     }
-
-    // 화면 전환
     Object.values(steps).forEach(el => el.classList.add('hidden'));
     steps[stepNum].classList.remove('hidden');
     window.scrollTo(0, 0);
 };
 
 window.startRecommendation = async function() {
-    window.goToStep(3); // 로딩 화면 (AI 분석 중)
+    window.goToStep(3); // 로딩 화면
 
     // 프롬프트 구성
     const prompt = `
@@ -121,9 +130,11 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        // [핵심 변경 사항]
-        // API Key 없이 Cloudflare Functions('/recommend')로 요청을 보냅니다.
-        const response = await fetch('/recommend', {
+        if (!apiKey) {
+            throw new Error("API Key is missing");
+        }
+
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -133,20 +144,12 @@ window.startRecommendation = async function() {
                 generationConfig: {
                     responseMimeType: "application/json"
                 },
-                // Cloudflare Function이 이 요청을 받아 Google Search Grounding 설정을 포함해 전달합니다.
-                tools: [{ google_search: {} }] 
+                tools: [{ google_search: {} }]
             })
         });
 
-        // 응답 상태 확인
-        if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error || "Server Error");
-        }
-
         const data = await response.json();
         
-        // Gemini 응답 처리
         if (data.candidates && data.candidates[0].content) {
             const resultText = data.candidates[0].content.parts[0].text;
             const resultJson = JSON.parse(resultText);
@@ -157,8 +160,12 @@ window.startRecommendation = async function() {
 
     } catch (error) {
         console.error("Error:", error);
-        alert("AI 연결 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
-        window.goToStep(2); // 에러 발생 시 설정 화면으로 복귀
+        if (!apiKey) {
+            alert("API 키 오류: .env 파일 또는 Cloudflare Secrets에 'VITE_GEMINI_API_KEY'가 설정되었는지 확인해주세요.");
+        } else {
+            alert("AI 연결 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.\n(상세: " + error.message + ")");
+        }
+        window.goToStep(2);
     }
 };
 
@@ -171,8 +178,6 @@ function renderResults(recommendations) {
         card.className = 'bg-white rounded-2xl p-5 shadow-md border border-gray-100 fade-in-up';
         card.style.animationDelay = `${index * 0.1}s`;
 
-        // 검색 링크 생성 (검색 쿼리 딥링크)
-        // 링크가 깨지지 않도록 검색 결과 페이지로 연결합니다.
         const naverLink = `https://search.shopping.naver.com/search/all?query=${encodeURIComponent(item.search_keyword)}`;
         const coupangLink = `https://www.coupang.com/np/search?component=&q=${encodeURIComponent(item.search_keyword)}`;
 
@@ -189,7 +194,6 @@ function renderResults(recommendations) {
                 💡 ${item.reason}
             </p>
 
-            <!-- 카드 메시지 보기 (토글) -->
             <div class="mb-4">
                 <button onclick="this.nextElementSibling.classList.toggle('hidden')" class="text-xs text-gray-400 underline hover:text-pink-500">
                     💌 함께 쓸 카드 문구 보기
