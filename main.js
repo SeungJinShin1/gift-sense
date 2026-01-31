@@ -1,7 +1,5 @@
 // Gemini API 설정을 위한 변수
 // 개발/배포 환경(Vite + Cloudflare)에서 .env 변수를 로드합니다.
-// 주의: 로컬 테스트 시 import.meta.env가 undefined일 수 있으므로 안전하게 접근합니다.
-const apiKey = import.meta.env?.VITE_GEMINI_API_KEY || ""; 
 
 // 상태 관리
 const state = {
@@ -130,16 +128,17 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        if (!apiKey) {
-            throw new Error("API Key is missing");
-        }
-
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+        // [변경됨] API 직접 호출 -> Cloudflare Function (/recommend) 호출
+        // 주의: Cloudflare Pages의 functions/ 폴더에 recommend.js가 있어야 합니다.
+        // Cloudflare 환경에서는 이 요청이 서버 사이드 함수로 전달되어 비밀 키를 사용해 Gemini를 호출합니다.
+        const response = await fetch('/recommend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
             body: JSON.stringify({
+                // Gemini API 스펙에 맞춘 본문을 전달합니다. 
+                // Backend 함수(recommend.js)가 이를 그대로 중계하거나, 필요한 부분만 추출해 쓸 수 있습니다.
                 contents: [{ parts: [{ text: prompt }] }],
                 generationConfig: {
                     responseMimeType: "application/json"
@@ -148,23 +147,33 @@ window.startRecommendation = async function() {
             })
         });
 
+        // 응답 상태 확인
+        if (!response.ok) {
+            const errText = await response.text();
+            throw new Error(`Server Error: ${response.status} ${errText}`);
+        }
+
         const data = await response.json();
         
+        // 데이터 구조 유효성 검사 (Backend 함수가 Gemini 응답을 그대로 주는지, 가공해서 주는지에 따라 다를 수 있음)
+        // 보통 Gemini Proxy라면 candidates 구조를 유지합니다.
         if (data.candidates && data.candidates[0].content) {
             const resultText = data.candidates[0].content.parts[0].text;
             const resultJson = JSON.parse(resultText);
             renderResults(resultJson.recommendations);
         } else {
-            throw new Error("No candidates returned");
+            // 만약 Backend가 바로 JSON을 반환한다면 (예외 처리)
+            if (data.recommendations) {
+                 renderResults(data.recommendations);
+            } else {
+                throw new Error("Invalid response format from server");
+            }
         }
 
     } catch (error) {
         console.error("Error:", error);
-        if (!apiKey) {
-            alert("API 키 오류: .env 파일 또는 Cloudflare Secrets에 'VITE_GEMINI_API_KEY'가 설정되었는지 확인해주세요.");
-        } else {
-            alert("AI 연결 중 문제가 발생했습니다. 잠시 후 다시 시도해주세요.\n(상세: " + error.message + ")");
-        }
+        // 에러 메시지: 이제는 API Key 오류가 아니라 네트워크/서버 오류입니다.
+        alert("AI 연결 중 문제가 발생했습니다. \n(Cloudflare Function '/recommend' 연결 실패 또는 서버 오류)\n\n상세: " + error.message);
         window.goToStep(2);
     }
 };
