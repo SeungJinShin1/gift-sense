@@ -1,7 +1,7 @@
 // Gemini API 설정을 위한 변수
-// 개발/배포 환경(Vite + Cloudflare)에서 .env 변수를 로드합니다.
+// 허용 도메인: https://gift-suggestion.com/*, https://gift-sense.pages.dev/*
+const apiKey ="AIzaSyBnMr6LWsAVL82pZbp32oRMucX70ncv2qA";
 
-// 상태 관리
 const state = {
     relation: '',
     gender: '',
@@ -19,7 +19,7 @@ const steps = {
 };
 const budgetSlider = document.getElementById('budget-slider');
 const budgetDisplay = document.getElementById('budget-display');
-let loadingInterval; // 로딩 텍스트 타이머 변수
+let loadingInterval;
 
 function init() {
     setupEventListeners();
@@ -73,6 +73,7 @@ function updateBudgetUI(val) {
     budgetDisplay.textContent = val >= 500000 ? "500,000원+" : val.toLocaleString() + "원";
 }
 
+// 전역 함수 등록
 window.goToStep = function(stepNum) {
     if (stepNum === 2) {
         if (!state.relation || !state.gender || !state.occasion) {
@@ -85,7 +86,6 @@ window.goToStep = function(stepNum) {
     window.scrollTo(0, 0);
 };
 
-// [추가됨] 동적 로딩 텍스트 함수
 function startLoadingAnimation() {
     const messages = [
         "최신 트렌드 검색 중...",
@@ -96,11 +96,12 @@ function startLoadingAnimation() {
     let msgIndex = 0;
     const titleEl = document.getElementById('loading-title');
     
-    // 0.8초마다 문구 변경 (생동감 부여)
-    loadingInterval = setInterval(() => {
-        msgIndex = (msgIndex + 1) % messages.length;
-        titleEl.textContent = messages[msgIndex];
-    }, 1200);
+    if (titleEl) {
+        loadingInterval = setInterval(() => {
+            msgIndex = (msgIndex + 1) % messages.length;
+            titleEl.textContent = messages[msgIndex];
+        }, 1200);
+    }
 }
 
 function stopLoadingAnimation() {
@@ -109,7 +110,7 @@ function stopLoadingAnimation() {
 
 window.startRecommendation = async function() {
     window.goToStep(3); 
-    startLoadingAnimation(); // 로딩 애니메이션 시작
+    startLoadingAnimation();
 
     const prompt = `
         당신은 대한민국 최고의 선물 추천 전문가(MD)입니다.
@@ -144,18 +145,30 @@ window.startRecommendation = async function() {
     `;
 
     try {
-        const response = await fetch('/recommend', {
+        // [방식 변경] Cloudflare 함수(/recommend) 대신 브라우저에서 직접 호출
+        // 이 방식은 사용자의 IP를 사용하므로 'User location' 에러를 우회합니다.
+        
+        if (!apiKey) {
+            // apiKey 변수는 상단에서 .env 또는 직접 입력된 값을 가져옵니다.
+            throw new Error("API Key가 설정되지 않았습니다. .env 파일을 확인해주세요.");
+        }
+
+        // Gemini 1.5 Flash 모델 사용 (안정적, 속도 빠름)
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: prompt }] }],
+                // Google Search Grounding 도구 사용
                 tools: [{ google_search: {} }]
             })
         });
 
         if (!response.ok) {
             const errorData = await response.json().catch(() => ({})); 
-            const errorMessage = errorData.error?.message || errorData.error || `서버 에러 (${response.status})`;
+            const errorMessage = errorData.error?.message || `API 호출 오류 (${response.status})`;
             throw new Error(errorMessage);
         }
 
@@ -163,29 +176,34 @@ window.startRecommendation = async function() {
         
         if (data.candidates && data.candidates[0].content) {
             let resultText = data.candidates[0].content.parts[0].text;
+            // JSON 파싱을 위한 전처리 (마크다운 기호 제거 등)
             const startIndex = resultText.indexOf('{');
             const endIndex = resultText.lastIndexOf('}');
             
             if (startIndex !== -1 && endIndex !== -1) {
                 resultText = resultText.substring(startIndex, endIndex + 1);
                 const resultJson = JSON.parse(resultText);
-                stopLoadingAnimation(); // 성공 시 애니메이션 중지
+                stopLoadingAnimation();
                 renderResults(resultJson.recommendations);
             } else {
-                throw new Error("응답에서 유효한 JSON 데이터를 찾을 수 없습니다.");
+                throw new Error("AI 응답에서 유효한 데이터를 찾을 수 없습니다.");
             }
-        } else if (data.recommendations) {
-            stopLoadingAnimation();
-            renderResults(data.recommendations);
         } else {
              console.error("Unknown Response:", data);
-             throw new Error("AI 응답 형식을 해석할 수 없습니다. (Safety Filter 등)");
+             throw new Error("AI 응답을 해석할 수 없습니다. (안전 필터 등)");
         }
 
     } catch (error) {
-        stopLoadingAnimation(); // 에러 시에도 중지
+        stopLoadingAnimation();
         console.error("Error details:", error);
-        alert(`문제가 발생했습니다. 잠시 후 다시 시도해주세요.\n\n[상세 에러]: ${error.message}`);
+        
+        let msg = "문제가 발생했습니다.";
+        if (error.message.includes("API Key")) msg = "API 키 설정 오류입니다.";
+        else if (error.message.includes("quota")) msg = "일시적인 사용량 초과입니다.";
+        else if (error.message.includes("location")) msg = "지역 제한 오류입니다.";
+        else msg = error.message;
+
+        alert(`오류: ${msg}\n잠시 후 다시 시도해주세요.`);
         window.goToStep(2);
     }
 };
@@ -239,4 +257,5 @@ function renderResults(recommendations) {
     window.goToStep(4);
 }
 
+// 앱 시작
 init();
