@@ -1,6 +1,3 @@
-// Gemini API 설정을 위한 변수
-const apiKey ="AIzaSyBnMr6LWsAVL82pZbp32oRMucX70ncv2qA";
-
 const state = {
     relation: '',
     gender: '',
