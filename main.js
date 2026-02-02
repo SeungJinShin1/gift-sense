@@ -1,5 +1,4 @@
 // Gemini API 설정을 위한 변수
-// 허용 도메인: https://gift-suggestion.com/*, https://gift-sense.pages.dev/*
 const apiKey ="AIzaSyBnMr6LWsAVL82pZbp32oRMucX70ncv2qA";
 
 const state = {
@@ -146,7 +145,7 @@ window.startRecommendation = async function() {
     try {
         // [변경됨] 내부 서버(/recommend) 호출 (API Key 노출 없음)
         // 이 요청은 Cloudflare Functions가 받아서 처리합니다.
-        const response = await fetch('/recommend', {
+        const response = await fetch('/api/recommend', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
