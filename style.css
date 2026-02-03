@@ -17,7 +17,7 @@ input[type=range]::-webkit-slider-thumb {
     height: 24px;
     width: 24px;
     border-radius: 50%;
-    background: #ec4899;
+    background: #ec4899; /* Pink-500 */
     cursor: pointer;
     margin-top: -10px; 
     box-shadow: 0 2px 6px rgba(0,0,0,0.2);
@@ -46,9 +46,9 @@ input[type=range]::-webkit-slider-runnable-track {
 }
 
 .selected-btn {
-    background-color: #fce7f3;
-    border-color: #ec4899;
-    color: #be185d;
+    background-color: #fce7f3; /* Pink-100 */
+    border-color: #ec4899; /* Pink-500 */
+    color: #be185d; /* Pink-700 */
     font-weight: 700;
 }
 
@@ -61,14 +61,14 @@ input[type=range]::-webkit-slider-runnable-track {
 
 .adsense-container {
     min-height: 100px;
-    background-color: #f1f5f9;
+    background-color: #ffffff; /* 흰색 배경으로 변경 */
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
 }
 
-/* [변경됨] 동적 로딩 애니메이션 스타일 */
+/* 로딩 애니메이션 스타일 */
 .loading-container {
     position: relative;
     width: 80px;
@@ -79,7 +79,6 @@ input[type=range]::-webkit-slider-runnable-track {
     margin-bottom: 20px;
 }
 
-/* 통통 튀는 선물 상자 */
 .bouncing-gift {
     font-size: 3rem;
     color: #ec4899;
@@ -92,7 +91,6 @@ input[type=range]::-webkit-slider-runnable-track {
     to { transform: translateY(-15px); }
 }
 
-/* 퍼져나가는 파동 효과 */
 .pulse-ring {
     position: absolute;
     width: 100%;
@@ -116,4 +114,18 @@ input[type=range]::-webkit-slider-runnable-track {
         transform: scale(1.5);
         opacity: 0;
     }
+}
+
+/* [추가] 콘텐츠 가이드 스타일 (SEO 텍스트 가독성) */
+#content-guide h3 {
+    letter-spacing: -0.02em;
+}
+#content-guide h4 {
+    border-left: 4px solid #ec4899;
+    padding-left: 10px;
+    margin-top: 30px;
+}
+#content-guide p, #content-guide dd {
+    word-break: keep-all; /* 한글 줄바꿈 최적화 */
+    line-height: 1.7;
 }

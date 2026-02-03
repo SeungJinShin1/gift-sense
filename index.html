@@ -2,12 +2,13 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
+    <!-- [중요] API 호출 시 출처 정보를 명확히 하기 위한 설정 (Referer Empty 에러 방지) -->
+    <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
     <!-- [소유권 확인] 구글 서치 콘솔 & 네이버 서치 어드바이저 -->
     <meta name="google-site-verification" content="C4pqeM-JOcX4BgU8bpliESq5og338Fye_UxUpGEdas4" />
     <meta name="naver-site-verification" content="5a2f221b09fba650b28b41f1a344e0de915e7b8f" />
-
     
     <!-- [SEO] 검색 엔진 최적화 -->
     <title>Gift-Sense | 실패 없는 AI 선물 추천 & 큐레이션</title>
@@ -107,25 +108,6 @@
             <button onclick="goToStep(2)" class="w-full bg-black text-white py-4 rounded-xl font-bold text-lg hover:bg-gray-800 transition shadow-lg transform active:scale-95">
                 다음: 예산 설정하기
             </button>
-
-            <!-- SEO 콘텐츠 -->
-            <article class="mt-12 pt-8 border-t border-gray-100 text-gray-500 text-xs leading-relaxed">
-                <h3 class="font-bold text-gray-700 mb-3 text-sm">Gift-Sense: 실패 없는 선물 추천 솔루션</h3>
-                <p class="mb-3">
-                    <strong>"도대체 뭘 선물해야 할까?"</strong> 매번 반복되는 선물 고민, 이제 Gift-Sense가 해결해 드립니다. 
-                    Gift-Sense는 최신 트렌드와 빅데이터를 기반으로 하는 <strong>AI 선물 추천 서비스</strong>입니다.
-                </p>
-                <ul class="list-disc pl-4 space-y-1 mb-3">
-                    <li><strong>20대/30대 생일 선물:</strong> 유행에 민감한 MZ세대를 위한 힙한 브랜드와 아이템 추천</li>
-                    <li><strong>집들이 선물:</strong> 뻔한 휴지 대신, 센스 있는 인테리어 소품과 실용적인 가전 추천</li>
-                    <li><strong>부모님/명절 선물:</strong> 건강과 감동을 모두 챙길 수 있는 프리미엄 선물 큐레이션</li>
-                    <li><strong>부담 없는 가벼운 선물:</strong> 1~3만원대 가격으로 마음을 전하는 가성비 아이템</li>
-                </ul>
-                <p>
-                    상대방의 성별, 연령, 관계, 그리고 예산만 입력하세요. 복잡한 검색 없이, 현재 가장 인기 있고 구매 만족도가 높은 
-                    <strong>네이버 쇼핑 및 쿠팡 최저가 상품</strong>을 즉시 찾아드립니다. 센스 있다는 칭찬, 이제 당신의 것입니다.
-                </p>
-            </article>
         </section>
 
         <!-- Step 2: 예산 설정 -->
@@ -193,28 +175,88 @@
             </div>
         </section>
 
-        <!-- 애드센스 광고 영역
-        <div class="mt-8 mb-4 adsense-container rounded-lg border border-gray-200">
+        <!-- [수정] 애드센스 광고 영역: 콘텐츠 중간에 자연스럽게 배치 -->
+        <div class="mt-8 mb-4 adsense-container rounded-lg border border-gray-200 bg-white">
             <div class="text-xs text-gray-400 p-4 text-center">
-                (이곳에 구글 애드센스 광고 코드 붙여넣기)
+                <!-- 여기에 구글 애드센스 '디스플레이 광고' 코드를 붙여넣으세요 -->
+                (구글 애드센스 광고 영역)
             </div>
-        </div> -->
+        </div>
 
-        <!-- 쿠팡 파트너스 배너 -->
+        <!-- [수정] 쿠팡 파트너스 배너 -->
         <div class="mt-4 border-t border-gray-100 pt-6">
             <iframe src="https://coupa.ng/cltDAP" width="100%" height="75" frameborder="0" scrolling="no" referrerpolicy="unsafe-url" browsingtopics></iframe>
         </div>
 
+        <!-- [신규] 애드센스 승인을 위한 텍스트 콘텐츠 영역 -->
+        <!-- 이 영역은 기능 아래쪽에 위치하여, 사용자 경험을 방해하지 않으면서 봇에게는 '풍부한 콘텐츠'를 제공합니다. -->
+        <article id="content-guide" class="mt-16 pt-10 border-t border-gray-200">
+            <div class="prose prose-sm max-w-none text-gray-600 leading-relaxed">
+                <h3 class="text-lg font-bold text-gray-800 mb-4 flex items-center">
+                    <i class="fa-solid fa-lightbulb text-yellow-400 mr-2"></i> 실패 없는 선물 고르는 노하우
+                </h3>
+                
+                <h4 class="font-bold text-gray-700 mt-6 mb-2">🎁 상황별 맞춤 선물 추천 가이드</h4>
+                <p class="mb-4">
+                    선물을 고르는 것은 언제나 즐거우면서도 어려운 고민입니다. 받는 사람의 취향, 나이, 그리고 선물하는 상황에 따라 적절한 아이템이 달라지기 때문입니다. Gift-Sense는 빅데이터를 기반으로 실패 확률을 줄여주는 맞춤형 추천을 제안합니다.
+                </p>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6">
+                    <strong class="block text-gray-800 mb-2">1. 20대~30대 생일 선물 트렌드</strong>
+                    <p class="text-sm">
+                        MZ세대는 '실용성'과 '감성'을 동시에 중요하게 생각합니다. 브랜드 인지도가 있으면서도, 너무 흔하지 않은 '스몰 럭셔리' 아이템이 인기입니다. 
+                        예를 들어, <strong>조말론, 딥티크</strong> 같은 니치 향수나 <strong>이솝, 논픽션</strong> 핸드크림은 호불호가 적고 센스 있다는 평을 듣기 좋습니다. 
+                        IT 기기를 좋아한다면 무선 충전기나 스마트폰 액세서리도 좋은 선택입니다.
+                    </p>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6">
+                    <strong class="block text-gray-800 mb-2">2. 센스 있는 집들이 선물</strong>
+                    <p class="text-sm">
+                        휴지나 세제는 이제 그만! 최근 집들이 선물 트렌드는 '인테리어 오브제'와 '소형 가전'입니다. 
+                        감성적인 무드등, <strong>일리 커피머신</strong>, 혹은 예쁜 디자인의 식기 세트가 인기입니다. 
+                        받는 분의 집 분위기를 잘 모른다면, 어디에나 잘 어울리는 디퓨저나 고급 타월 세트가 안전한 선택입니다.
+                    </p>
+                </div>
+
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-100 mb-6">
+                    <strong class="block text-gray-800 mb-2">3. 부모님 & 명절 선물</strong>
+                    <p class="text-sm">
+                        부모님 선물에서 가장 중요한 키워드는 '건강'과 '현금'입니다. 하지만 현금만 드리기 정 없다면, 
+                        <strong>정관장 홍삼</strong> 같은 건강기능식품이나 안마기, 마사지 건 등이 효도 선물로 꾸준히 사랑받고 있습니다. 
+                        최근에는 로봇 청소기나 식기세척기 같은 가사 노동을 줄여주는 가전제품도 큰 환영을 받습니다.
+                    </p>
+                </div>
+
+                <h4 class="font-bold text-gray-700 mt-8 mb-2">💡 자주 묻는 질문 (FAQ)</h4>
+                <dl class="space-y-4">
+                    <div>
+                        <dt class="font-bold text-gray-800">Q. AI 추천 결과는 신뢰할 수 있나요?</dt>
+                        <dd class="text-sm mt-1">A. 네, Gift-Sense는 구글의 최신 생성형 AI 모델(Gemini)을 사용하여, 인터넷상의 방대한 쇼핑 데이터와 최신 트렌드, 사용자 리뷰를 실시간으로 분석해 추천합니다.</dd>
+                    </div>
+                    <div>
+                        <dt class="font-bold text-gray-800">Q. 예산 범위는 어떻게 설정하나요?</dt>
+                        <dd class="text-sm mt-1">A. '가벼운 선물'(1~3만원), '적당한 선물'(5~10만원), '특별한 선물'(10만원 이상) 등 슬라이더를 통해 원하시는 예산을 설정하시면, 그 가격대에서 가장 만족도 높은 상품을 골라드립니다.</dd>
+                    </div>
+                </dl>
+            </div>
+        </article>
+
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-50 py-6 text-center text-xs text-gray-400 border-t">
-        <p>Gift-Sense © 2026. Powered by Google Gemini.</p>
-        <p class="mt-1 mb-2">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
-        <div class="space-x-2">
-            <a href="#" class="hover:text-gray-600 underline">이용약관</a>
+    <footer class="bg-gray-50 py-8 text-center text-xs text-gray-400 border-t">
+        <p class="font-bold text-gray-500 mb-2">Gift-Sense</p>
+        <p class="mb-4">Gift-Sense © 2026. Powered by Google Gemini.</p>
+        <p class="mt-1 mb-4">이 포스팅은 쿠팡 파트너스 활동의 일환으로,<br>이에 따른 일정액의 수수료를 제공받습니다.</p>
+        
+        <!-- [수정] 필수 링크들을 텍스트와 함께 명확하게 표시 -->
+        <div class="flex justify-center space-x-4 border-t border-gray-200 pt-4 w-3/4 mx-auto">
+            <a href="#" class="hover:text-gray-600">서비스 이용약관</a>
             <span class="text-gray-300">|</span>
-            <a href="#" class="hover:text-gray-600 underline">개인정보처리방침</a>
+            <a href="#" class="hover:text-gray-600 font-bold">개인정보처리방침</a>
+            <span class="text-gray-300">|</span>
+            <a href="#" class="hover:text-gray-600">문의하기</a>
         </div>
     </footer>
 
