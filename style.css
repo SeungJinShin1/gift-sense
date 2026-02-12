@@ -116,16 +116,31 @@ input[type=range]::-webkit-slider-runnable-track {
     }
 }
 
-/* [추가] 콘텐츠 가이드 스타일 (SEO 텍스트 가독성) */
+/* [신규] 매거진 콘텐츠 가이드 스타일 (SEO 및 애드센스 텍스트 가독성 향상) */
+#content-guide h2 {
+    letter-spacing: -0.05em;
+    border-bottom: 2px solid #fce7f3;
+    padding-bottom: 10px;
+}
 #content-guide h3 {
     letter-spacing: -0.02em;
+    position: relative;
+    padding-left: 12px;
 }
-#content-guide h4 {
-    border-left: 4px solid #ec4899;
-    padding-left: 10px;
-    margin-top: 30px;
+#content-guide h3::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 5px;
+    height: 16px;
+    width: 4px;
+    background-color: #ec4899;
+    border-radius: 2px;
 }
 #content-guide p, #content-guide dd {
-    word-break: keep-all; /* 한글 줄바꿈 최적화 */
+    word-break: keep-all; /* 한글 줄바꿈 최적화 (단어 단위) */
+    line-height: 1.8;
+}
+#content-guide li {
     line-height: 1.7;
 }
